@@ -1,0 +1,10 @@
+{% import "partials/macros.html" as macros %}
+{% if bookmarks %}
+  {% for b in bookmarks %}
+    {{ macros.bookmark_row(b) }}
+  {% endfor %}
+{% else %}
+  <div class="empty">
+    <p>No bookmarks match.</p>
+  </div>
+{% endif %}

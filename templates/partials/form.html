@@ -1,0 +1,42 @@
+<header>
+  <h3>{% if bookmark.id %}Edit bookmark{% else %}New bookmark{% endif %}</h3>
+</header>
+
+<form
+  {% if method == 'put' %}
+    hx-put="{{ action }}"
+  {% else %}
+    hx-post="{{ action }}"
+  {% endif %}
+  hx-target="#bookmark-list"
+  hx-swap="innerHTML"
+>
+  <label>
+    URL
+    <input type="text" name="url" value="{{ bookmark.url }}"
+      aria-invalid="{{ 'true' if errors.url else '' }}" required />
+    {% if errors.url %}<small class="error">{{ errors.url }}</small>{% endif %}
+  </label>
+
+  <label>
+    Title
+    <input type="text" name="title" value="{{ bookmark.title }}"
+      aria-invalid="{{ 'true' if errors.title else '' }}" required />
+    {% if errors.title %}<small class="error">{{ errors.title }}</small>{% endif %}
+  </label>
+
+  <label>
+    Description
+    <textarea name="description" rows="3">{{ bookmark.description or '' }}</textarea>
+  </label>
+
+  <label>
+    Tags (comma-separated)
+    <input type="text" name="tags" value="{{ bookmark.tags|join(', ') }}" />
+  </label>
+
+  <footer class="form-footer">
+    <button type="button" class="secondary" onclick="closeModal()">Cancel</button>
+    <button type="submit">{% if bookmark.id %}Save{% else %}Create{% endif %}</button>
+  </footer>
+</form>

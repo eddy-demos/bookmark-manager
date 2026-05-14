@@ -1,0 +1,35 @@
+{% macro tag_pill(name, active=False) %}
+<a
+  class="tag-pill {% if active %}active{% endif %}"
+  href="/?tag={{ name }}"
+  hx-get="/bookmarks?tag={{ name }}"
+  hx-target="#bookmark-list"
+  hx-push-url="/?tag={{ name }}"
+  onclick="document.querySelector('input[name=tag]').value='{{ name }}'"
+>{{ name }}</a>
+{% endmacro %}
+
+{% macro bookmark_row(b) %}
+<article class="bookmark" id="bookmark-{{ b.id }}">
+  <div class="bookmark-main">
+    <a class="bookmark-title" href="{{ b.url }}" target="_blank" rel="noopener">{{ b.title }}</a>
+    <small class="bookmark-host">{{ b.url|hostname }}</small>
+    {% if b.description %}<p class="bookmark-desc">{{ b.description }}</p>{% endif %}
+    {% if b.tags %}
+      <div class="tag-row">
+        {% for t in b.tags %}<span class="tag-pill small">{{ t }}</span>{% endfor %}
+      </div>
+    {% endif %}
+  </div>
+  <div class="bookmark-actions">
+    <button class="secondary outline tiny"
+      hx-get="/bookmarks/{{ b.id }}/edit"
+      hx-target="#modal-content">Edit</button>
+    <button class="contrast outline tiny"
+      hx-delete="/bookmarks/{{ b.id }}"
+      hx-target="#bookmark-{{ b.id }}"
+      hx-swap="outerHTML"
+      hx-confirm="Delete this bookmark?">Delete</button>
+  </div>
+</article>
+{% endmacro %}
