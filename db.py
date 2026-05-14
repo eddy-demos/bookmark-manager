@@ -25,14 +25,54 @@ CREATE TABLE IF NOT EXISTS bookmark_tags (
 """
 
 SEED = [
-    ("https://www.python.org", "Python", "The official Python language site.", ["python", "language"]),
-    ("https://fastapi.tiangolo.com", "FastAPI", "Modern, fast web framework for Python.", ["python", "web", "framework"]),
-    ("https://htmx.org", "HTMX", "High power tools for HTML.", ["web", "frontend", "htmx"]),
-    ("https://picocss.com", "Pico.css", "Minimal CSS framework for semantic HTML.", ["css", "frontend"]),
-    ("https://sqlite.org", "SQLite", "Self-contained, serverless SQL database engine.", ["database", "sqlite"]),
-    ("https://github.com", "GitHub", "Where the world builds software.", ["tools", "git"]),
-    ("https://news.ycombinator.com", "Hacker News", "Tech and startup news aggregator.", ["news", "tech"]),
-    ("https://developer.mozilla.org", "MDN Web Docs", "Resources for developers, by developers.", ["web", "docs", "reference"]),
+    (
+        "https://www.python.org",
+        "Python",
+        "The official Python language site.",
+        ["python", "language"],
+    ),
+    (
+        "https://fastapi.tiangolo.com",
+        "FastAPI",
+        "Modern, fast web framework for Python.",
+        ["python", "web", "framework"],
+    ),
+    (
+        "https://htmx.org",
+        "HTMX",
+        "High power tools for HTML.",
+        ["web", "frontend", "htmx"],
+    ),
+    (
+        "https://picocss.com",
+        "Pico.css",
+        "Minimal CSS framework for semantic HTML.",
+        ["css", "frontend"],
+    ),
+    (
+        "https://sqlite.org",
+        "SQLite",
+        "Self-contained, serverless SQL database engine.",
+        ["database", "sqlite"],
+    ),
+    (
+        "https://github.com",
+        "GitHub",
+        "Where the world builds software.",
+        ["tools", "git"],
+    ),
+    (
+        "https://news.ycombinator.com",
+        "Hacker News",
+        "Tech and startup news aggregator.",
+        ["news", "tech"],
+    ),
+    (
+        "https://developer.mozilla.org",
+        "MDN Web Docs",
+        "Resources for developers, by developers.",
+        ["web", "docs", "reference"],
+    ),
 ]
 
 
@@ -85,7 +125,9 @@ def _normalize_tags(raw):
 def _attach_tags(conn, bookmark_id, tag_names):
     for name in tag_names:
         conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (name,))
-        tid = conn.execute("SELECT id FROM tags WHERE name = ?", (name,)).fetchone()["id"]
+        tid = conn.execute("SELECT id FROM tags WHERE name = ?", (name,)).fetchone()[
+            "id"
+        ]
         conn.execute(
             "INSERT OR IGNORE INTO bookmark_tags (bookmark_id, tag_id) VALUES (?, ?)",
             (bookmark_id, tid),
@@ -130,7 +172,9 @@ def list_bookmarks(q=None, tag=None):
 
 def get_bookmark(bookmark_id):
     with connection() as conn:
-        r = conn.execute("SELECT * FROM bookmarks WHERE id = ?", (bookmark_id,)).fetchone()
+        r = conn.execute(
+            "SELECT * FROM bookmarks WHERE id = ?", (bookmark_id,)
+        ).fetchone()
         if not r:
             return None
         tags = conn.execute(

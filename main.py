@@ -43,9 +43,9 @@ def index(request: Request, q: str = "", tag: str = ""):
     bookmarks = db.list_bookmarks(q=q or None, tag=tag or None)
     tags = db.list_tags()
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "bookmarks": bookmarks,
             "tags": tags,
             "q": q,
@@ -58,18 +58,25 @@ def index(request: Request, q: str = "", tag: str = ""):
 def bookmarks_partial(request: Request, q: str = "", tag: str = ""):
     bookmarks = db.list_bookmarks(q=q or None, tag=tag or None)
     return templates.TemplateResponse(
+        request,
         "partials/bookmark_list.html",
-        {"request": request, "bookmarks": bookmarks, "q": q, "active_tag": tag},
+        {"bookmarks": bookmarks, "q": q, "active_tag": tag},
     )
 
 
 @app.get("/bookmarks/new", response_class=HTMLResponse)
 def new_form(request: Request):
     return templates.TemplateResponse(
+        request,
         "partials/form.html",
         {
-            "request": request,
-            "bookmark": {"id": None, "url": "", "title": "", "description": "", "tags": []},
+            "bookmark": {
+                "id": None,
+                "url": "",
+                "title": "",
+                "description": "",
+                "tags": [],
+            },
             "errors": {},
             "action": "/bookmarks",
             "method": "post",
@@ -88,10 +95,16 @@ def create(
     errors = validate(url, title)
     if errors:
         return templates.TemplateResponse(
+            request,
             "partials/form.html",
             {
-                "request": request,
-                "bookmark": {"id": None, "url": url, "title": title, "description": description, "tags": [t.strip() for t in tags.split(",") if t.strip()]},
+                "bookmark": {
+                    "id": None,
+                    "url": url,
+                    "title": title,
+                    "description": description,
+                    "tags": [t.strip() for t in tags.split(",") if t.strip()],
+                },
                 "errors": errors,
                 "action": "/bookmarks",
                 "method": "post",
@@ -101,8 +114,9 @@ def create(
     db.create_bookmark(url.strip(), title.strip(), description.strip(), tags)
     bookmarks = db.list_bookmarks()
     resp = templates.TemplateResponse(
+        request,
         "partials/bookmark_list.html",
-        {"request": request, "bookmarks": bookmarks, "q": "", "active_tag": ""},
+        {"bookmarks": bookmarks, "q": "", "active_tag": ""},
     )
     resp.headers["HX-Trigger"] = "bookmarks-changed"
     return resp
@@ -114,9 +128,9 @@ def edit_form(request: Request, bookmark_id: int):
     if not b:
         return Response(status_code=404)
     return templates.TemplateResponse(
+        request,
         "partials/form.html",
         {
-            "request": request,
             "bookmark": b,
             "errors": {},
             "action": f"/bookmarks/{bookmark_id}",
@@ -137,21 +151,30 @@ def update(
     errors = validate(url, title)
     if errors:
         return templates.TemplateResponse(
+            request,
             "partials/form.html",
             {
-                "request": request,
-                "bookmark": {"id": bookmark_id, "url": url, "title": title, "description": description, "tags": [t.strip() for t in tags.split(",") if t.strip()]},
+                "bookmark": {
+                    "id": bookmark_id,
+                    "url": url,
+                    "title": title,
+                    "description": description,
+                    "tags": [t.strip() for t in tags.split(",") if t.strip()],
+                },
                 "errors": errors,
                 "action": f"/bookmarks/{bookmark_id}",
                 "method": "put",
             },
             status_code=400,
         )
-    db.update_bookmark(bookmark_id, url.strip(), title.strip(), description.strip(), tags)
+    db.update_bookmark(
+        bookmark_id, url.strip(), title.strip(), description.strip(), tags
+    )
     bookmarks = db.list_bookmarks()
     resp = templates.TemplateResponse(
+        request,
         "partials/bookmark_list.html",
-        {"request": request, "bookmarks": bookmarks, "q": "", "active_tag": ""},
+        {"bookmarks": bookmarks, "q": "", "active_tag": ""},
     )
     resp.headers["HX-Trigger"] = "bookmarks-changed"
     return resp
@@ -169,6 +192,7 @@ def delete(bookmark_id: int):
 def tags_partial(request: Request, tag: str = ""):
     tags = db.list_tags()
     return templates.TemplateResponse(
+        request,
         "partials/tags.html",
-        {"request": request, "tags": tags, "active_tag": tag},
+        {"tags": tags, "active_tag": tag},
     )
