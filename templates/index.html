@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as macros %}
+
+{% block body %}
+<main class="container-fluid app">
+  <aside class="sidebar">
+    <hgroup>
+      <h2>Bookmarks</h2>
+      <p>A tiny CRUD manager.</p>
+    </hgroup>
+
+    <input
+      type="search"
+      name="q"
+      placeholder="Search..."
+      value="{{ q }}"
+      hx-get="/bookmarks"
+      hx-trigger="input changed delay:300ms, search"
+      hx-target="#bookmark-list"
+      hx-include="[name='tag']"
+    />
+    <input type="hidden" name="tag" value="{{ active_tag }}" />
+
+    <button
+      class="new-btn"
+      hx-get="/bookmarks/new"
+      hx-target="#modal-content"
+    >+ New bookmark</button>
+
+    <div id="tag-sidebar">
+      {% include "partials/tags.html" %}
+    </div>
+  </aside>
+
+  <section class="content">
+    <header class="content-header">
+      {% if active_tag %}
+        <h3>Tag: {{ active_tag }}</h3>
+      {% elif q %}
+        <h3>Search: {{ q }}</h3>
+      {% else %}
+        <h3>All bookmarks</h3>
+      {% endif %}
+      <small id="result-count">{{ bookmarks|length }} result{{ '' if bookmarks|length == 1 else 's' }}</small>
+    </header>
+
+    <div id="bookmark-list">
+      {% include "partials/bookmark_list.html" %}
+    </div>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bookmarks</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body>
+  {% block body %}{% endblock %}
+
+  <dialog id="modal">
+    <article>
+      <div id="modal-content"></div>
+    </article>
+  </dialog>
+
+  <script>
+    const modal = document.getElementById('modal');
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+      if (e.detail.target.id === 'modal-content' && e.detail.target.innerHTML.trim() !== '') {
+        if (!modal.open) modal.showModal();
+      }
+    });
+    document.body.addEventListener('bookmarks-changed', () => {
+      modal.close();
+      document.getElementById('modal-content').innerHTML = '';
+      htmx.ajax('GET', '/tags?tag=' + encodeURIComponent(getActiveTag()), '#tag-sidebar');
+    });
+    function closeModal() {
+      modal.close();
+      document.getElementById('modal-content').innerHTML = '';
+    }
+    function getActiveTag() {
+      const el = document.querySelector('input[name="tag"]');
+      return el ? el.value : '';
+    }
+  </script>
+</body>
+</html>

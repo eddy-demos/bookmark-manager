@@ -1,0 +1,25 @@
+<nav class="tag-nav">
+  <h6>Tags</h6>
+  <ul>
+    <li>
+      <a class="tag-link {% if not active_tag %}active{% endif %}"
+         href="/"
+         hx-get="/bookmarks"
+         hx-target="#bookmark-list"
+         hx-push-url="/"
+         onclick="document.querySelector('input[name=tag]').value=''">All</a>
+    </li>
+    {% for t in tags %}
+    <li>
+      <a class="tag-link {% if active_tag == t.name %}active{% endif %}"
+         href="/?tag={{ t.name }}"
+         hx-get="/bookmarks?tag={{ t.name }}"
+         hx-target="#bookmark-list"
+         hx-push-url="/?tag={{ t.name }}"
+         onclick="document.querySelector('input[name=tag]').value='{{ t.name }}'">
+        {{ t.name }} <small>({{ t.count }})</small>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
